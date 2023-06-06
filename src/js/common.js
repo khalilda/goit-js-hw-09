@@ -1,6 +1,6 @@
-//Виносимо допоміжні функції в окремий файл для очищення коду
+// a file to make the code nicer and easier to read
 
-// Функція для конвертації часу - task2
+
 function convertMs(ms) {
     // Number of milliseconds per unit of time
     const second = 1000;
@@ -20,7 +20,7 @@ function convertMs(ms) {
     return { days, hours, minutes, seconds };
   }
   
-  // Функції для форматування часу - task2
+
   function formatTime(time) {
     return String(time).padStart(2, '0');
   }
@@ -33,8 +33,7 @@ function convertMs(ms) {
   
     return { formatDays, formatHours, formatMinutes, formatSeconds };
   }
-  
-  // Функція створення промісу - task3
+
   function createPromise(position, delay) {
     const shouldResolve = Math.random() > 0.3;
   

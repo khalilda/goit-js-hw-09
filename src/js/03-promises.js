@@ -1,10 +1,9 @@
-// Імпортуємо функцію
+
 import { createPromise } from './common';
 
-// Імпорт Notify
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-// Створюємо селектори для відстеження DOM
+
 const refs = {
   form: document.querySelector('.form'),
   delayEl: document.querySelector('[name="delay"]'),
@@ -12,10 +11,9 @@ const refs = {
   amountEl: document.querySelector('[name="amount"]'),
 };
 
-// Додаємо слухача подій
 refs.form.addEventListener('submit', onFormSubmit);
 
-// Функція для виклику при "Submit"
+
 function onFormSubmit(event) {
   event.preventDefault();
   let position = 0;

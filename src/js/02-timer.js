@@ -1,14 +1,13 @@
-// Імпортуємо функції
+
 import { convertMs, addLeadingZero } from './common';
 
-// Імпорт flatpickr
+
 import flatpickr from 'flatpickr';
-// Додатковий імпорт стилів flatpickr
+
 import 'flatpickr/dist/flatpickr.min.css';
-// Імпорт Notify
+
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-// Створюємо селектори для відстеження DOM
 const refs = {
   btnStart: document.querySelector('button[data-start]'),
   input: document.querySelector('#datetime-picker'),
@@ -18,21 +17,20 @@ const refs = {
   seconds: document.querySelector('[data-seconds]'),
 };
 
-// Додаємо слухачів подій
+
 refs.btnStart.addEventListener('click', onBtnClick);
 
-// Створюємо змінну для зберігання часу інтервалу та самого інтервалу
-// та робимо кнопку "Start" неактивною за замовченням
+
 const INTERVAL = 1000;
 let timeInterval = null;
 refs.btnStart.setAttribute('disabled', true);
 
-// Створюємо змінні для зберігання часу
+
 let chosenDate = null;
 let actualDate = null;
 let timeToFinish = null;
 
-// Опції для flatpickr
+
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -53,10 +51,9 @@ const options = {
   },
 };
 
-// Ініціалізуємо flatpickr
+
 flatpickr(refs.input, options);
 
-// Функція для виклику на кнопці "Start"
 function onBtnClick() {
   actualDate = new Date();
   timeToFinish = chosenDate - actualDate;
@@ -71,7 +68,7 @@ function onBtnClick() {
   }
 }
 
-// Функції старт та стоп зворотнього відліку
+
 function startCountdown() {
   interfaceUpdate(addLeadingZero(convertMs(timeToFinish)));
   timeInterval = setInterval(() => {
@@ -92,7 +89,6 @@ function stopCountdown() {
   clearInterval(timeInterval);
 }
 
-// Функція для передачі даних в DOM
 function interfaceUpdate({
   formatDays,
   formatHours,
