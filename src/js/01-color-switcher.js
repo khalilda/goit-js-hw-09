@@ -1,36 +1,42 @@
-const CHANGE_COLOR_DELAY = 1000;
-let idInt = null;
-
+// Створюємо селектори для відстеження DOM
 const refs = {
-    btnStart: document.querySelector('button[data-start]'),
-    btnStop: document.querySelector('button[data-stop]'),
     body: document.querySelector('body'),
-}
-
-
-refs.btnStop.disabled = true;
-refs.btnStart.addEventListener('click', onBtnStartChangeColor);
-refs.btnStop.addEventListener('click', onBtnStopChangeColor);
-
-
-function onBtnStartChangeColor() {
-    refs.btnStart.disabled = true;
-    refs.btnStop.disabled = false;
- 
-
-    idInt = setInterval(() => {
-        refs.body.style.backgroundColor = getRandomHexColor()
-    }, CHANGE_COLOR_DELAY);
-}
-
-function onBtnStopChangeColor() {
-    refs.btnStart.disabled = false;
-    refs.btnStop.disabled = true;
-
-    clearInterval(idInt);
-}
-
-function getRandomHexColor() {
-    return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-}
-
+    start: document.querySelector('[data-start]'),
+    stop: document.querySelector('[data-stop]'),
+  };
+  
+  // Створюємо змінну для зберігання часу інтервалу та самого інтервалу
+  // та робимо кнопку "Stop" неактивною за замовченням
+  const INTERVAL = 1000;
+  let colorInterval = null;
+  refs.stop.setAttribute('disabled', true);
+  
+  // Генератор випадкового кольору
+  function getRandomHexColor() {
+    return (refs.body.style.backgroundColor = `#${Math.floor(
+      Math.random() * 16777215
+    )
+      .toString(16)
+      .padStart(6, 0)}`);
+  }
+  
+  // Додаємо слухачів подій
+  refs.start.addEventListener('click', onClickStart);
+  refs.stop.addEventListener('click', onClickStop);
+  
+  // Функція для запуску зміни кольорів та робимо кнопку "Start" неактивною
+  function onClickStart() {
+    refs.start.setAttribute('disabled', true);
+    refs.stop.removeAttribute('disabled');
+    colorInterval = setInterval(() => {
+      getRandomHexColor();
+    }, INTERVAL);
+  }
+  
+  // Функція для зупинення зміни кольорів та робимо кнопку "Start" знову активною
+  function onClickStop() {
+    clearInterval(colorInterval);
+    refs.start.removeAttribute('disabled');
+    refs.stop.setAttribute('disabled', true);
+  }
+  

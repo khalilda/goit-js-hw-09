@@ -1,109 +1,106 @@
+// Імпортуємо функції
+import { convertMs, addLeadingZero } from './common';
+
+// Імпорт flatpickr
 import flatpickr from 'flatpickr';
+// Додатковий імпорт стилів flatpickr
 import 'flatpickr/dist/flatpickr.min.css';
-import { Report } from 'notiflix/build/notiflix-report-aio';
+// Імпорт Notify
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-document.body.style.backgroundColor = '#red';
-const TIMER_DELAY = 1000;
-let intervalId = null;
-let selectedDate = null;
-let currentDate = null;
+// Створюємо селектори для відстеження DOM
+const refs = {
+  btnStart: document.querySelector('button[data-start]'),
+  input: document.querySelector('#datetime-picker'),
+  days: document.querySelector('[data-days]'),
+  hours: document.querySelector('[data-hours]'),
+  minutes: document.querySelector('[data-minutes]'),
+  seconds: document.querySelector('[data-seconds]'),
+};
 
+// Додаємо слухачів подій
+refs.btnStart.addEventListener('click', onBtnClick);
 
-const calendar = document.querySelector('#datetime-picker');
-const startBtn = document.querySelector('[data-start-timer]');
-startBtn.disabled = true;
+// Створюємо змінну для зберігання часу інтервалу та самого інтервалу
+// та робимо кнопку "Start" неактивною за замовченням
+const INTERVAL = 1000;
+let timeInterval = null;
+refs.btnStart.setAttribute('disabled', true);
 
-Report.info(
-  '👋 Greeting, my Friend!',
-  'Please, choose a date and click on start',
-  'Okay'
-);
+// Створюємо змінні для зберігання часу
+let chosenDate = null;
+let actualDate = null;
+let timeToFinish = null;
 
-flatpickr(calendar, {
+// Опції для flatpickr
+const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    if (selectedDates[0].getTime() < Date.now()) {
-      Report.failure(
-        '🥺 Ooops...',
-        'Please, choose a date in the future and remember: "Knowledge rests not upon truth alone, but upon error also." - Carl Gustav Jung',
-        'Okay'
-      );
-    } else {
-      Report.success(
-        '🥰 Congratulation! Click on start!',
-        '"Do not try to become a person of success but try to become a person of value." <br/><br/>- Albert Einstein',
-        'Okay'
-      );
-      startBtn.disabled = false;
-      const setTimer = () => {
-        selectedDate = selectedDates[0].getTime();
-        timer.start();
-      };
+    chosenDate = selectedDates[0];
+    actualDate = new Date();
+    timeToFinish = chosenDate - actualDate;
 
-      startBtn.addEventListener('click', setTimer);
+    if (timeToFinish > 0) {
+      Notify.success('You can start countdown');
+      refs.btnStart.removeAttribute('disabled');
+    } else {
+      Notify.failure('Please choose a date in the future');
+      refs.btnStart.setAttribute('disabled', true);
     }
   },
-});
-
-const timer = {
-  rootSelector: document.querySelector('.timer'),
-  start() {
-    intervalId = setInterval(() => {
-      startBtn.disabled = true;
-      calendar.disabled = true;
-      currentDate = Date.now();
-      const delta = selectedDate - currentDate;
-
-      if (delta <= 0) {
-        this.stop();
-        Report.info(
-          '👏 Congratulation! Timer stopped!',
-          'Please, if you want to start timer, choose a date and click on start or reload this page',
-          'Okay'
-        );
-        return;
-      }
-      const { days, hours, minutes, seconds } = this.convertMs(delta);
-      this.rootSelector.querySelector('[data-days]').textContent =
-        this.addLeadingZero(days);
-      this.rootSelector.querySelector('[data-hours]').textContent =
-        this.addLeadingZero(hours);
-      this.rootSelector.querySelector('[data-minutes]').textContent =
-        this.addLeadingZero(minutes);
-      this.rootSelector.querySelector('[data-seconds]').textContent =
-        this.addLeadingZero(seconds);
-    }, TIMER_DELAY);
-  },
-
-  stop() {
-    clearInterval(intervalId);
-    this.intervalId = null;
-    startBtn.disabled = true;
-    calendar.disabled = false;
-  },
-
-  convertMs(ms) {
-    const second = 1000;
-    const minute = second * 60;
-    const hour = minute * 60;
-    const day = hour * 24;
-
-    const days = this.addLeadingZero(Math.floor(ms / day));
-    const hours = this.addLeadingZero(Math.floor((ms % day) / hour));
-    const minutes = this.addLeadingZero(
-      Math.floor(((ms % day) % hour) / minute)
-    );
-    const seconds = this.addLeadingZero(
-      Math.floor((((ms % day) % hour) % minute) / second)
-    );
-
-    return { days, hours, minutes, seconds };
-  },
-
-  addLeadingZero(value) {
-    return String(value).padStart(2, 0);
-  },
 };
+
+// Ініціалізуємо flatpickr
+flatpickr(refs.input, options);
+
+// Функція для виклику на кнопці "Start"
+function onBtnClick() {
+  actualDate = new Date();
+  timeToFinish = chosenDate - actualDate;
+  if (timeToFinish > 0) {
+    Notify.success('We are starting countdown');
+    startCountdown();
+    refs.btnStart.setAttribute('disabled', true);
+    refs.input.setAttribute('disabled', true);
+  } else {
+    Notify.failure('Please choose a date in the future');
+    refs.btnStart.setAttribute('disabled', true);
+  }
+}
+
+// Функції старт та стоп зворотнього відліку
+function startCountdown() {
+  interfaceUpdate(addLeadingZero(convertMs(timeToFinish)));
+  timeInterval = setInterval(() => {
+    timeToFinish -= INTERVAL;
+
+    interfaceUpdate(addLeadingZero(convertMs(timeToFinish)));
+
+    if (timeToFinish < INTERVAL) {
+      stopCountdown();
+      Notify.success('TIME IS OVER');
+      refs.btnStart.removeAttribute('disabled');
+      refs.input.removeAttribute('disabled');
+    }
+  }, INTERVAL);
+}
+
+function stopCountdown() {
+  clearInterval(timeInterval);
+}
+
+// Функція для передачі даних в DOM
+function interfaceUpdate({
+  formatDays,
+  formatHours,
+  formatMinutes,
+  formatSeconds,
+}) {
+  refs.days.textContent = formatDays;
+  refs.hours.textContent = formatHours;
+  refs.minutes.textContent = formatMinutes;
+  refs.seconds.textContent = formatSeconds;
+}
