@@ -1,7 +1,7 @@
 
 const refs = {
     body: document.querySelector('body'),
-    start: document.querySelector('[data-start]'),
+    start: document.querySelector('[data-start-timer]'),
     stop: document.querySelector('[data-stop]'),
   };
   
