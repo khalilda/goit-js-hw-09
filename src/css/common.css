@@ -18,4 +18,23 @@ img {
 }
 
 
+.timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: red;
+  color: chartreuse;
+}
+
+button {
+  background-color: aqua;
+  color: black;
+  border-radius: 10px;
+}
+
+text {
+  border-radius: 10px;
+}
+
+
 
